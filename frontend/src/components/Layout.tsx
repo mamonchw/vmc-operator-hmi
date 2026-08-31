@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react';
-import { Settings, PowerOff } from 'lucide-react';
+import React from 'react';
+import type { ReactNode } from 'react';
+import { Settings } from 'lucide-react';
 import type { WorkflowState } from '../services/api';
 
 interface LayoutProps {

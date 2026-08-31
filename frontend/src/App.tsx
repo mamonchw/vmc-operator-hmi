@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Layout } from './components/Layout';
 import { ChecklistItem } from './components/ChecklistItem';
-import api, { 
+import { 
   fetchState, advanceWorkflow, startOperation, stopOperation,
   confirmMachineCheck, confirmTool, confirmWorkpieceSetup, resetWorkflow
 } from './services/api';
