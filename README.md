@@ -45,6 +45,24 @@ This project was built with a modern, robust, and highly scalable tech stack:
 
 ---
 
+## 📡 API Endpoints
+
+The FastAPI backend exposes the following RESTful endpoints (view the full interactive Swagger documentation by navigating to `/docs` on the running backend URL):
+
+### Workflow & State
+* `GET /api/v1/workflow/state` - Fetch the full state of the HMI (current stage, scenario info, and all checklist items).
+* `POST /api/v1/workflow/advance` - Advance the state machine to the next stage (only works if all checks for the current stage are confirmed).
+* `POST /api/v1/workflow/operation/start` - Change the operation status to RUNNING.
+* `POST /api/v1/workflow/operation/stop` - Change the operation status to STOPPED.
+* `POST /api/v1/workflow/reset` - Reset the entire workflow back to the POWER_ON stage.
+
+### Checks & Confirmation
+* `POST /api/v1/checks/machine/{check_id}/confirm` - Confirm a specific machine check.
+* `POST /api/v1/checks/tool/{tool_id}/confirm` - Confirm a specific tooling requirement.
+* `POST /api/v1/checks/workpiece/{setup_id}/confirm` - Confirm a specific workpiece setup instruction.
+
+---
+
 ## 🚀 How to Run This Project (Local Development)
 
 To run this project on your local machine, follow these steps:
