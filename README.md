@@ -1,129 +1,107 @@
-# VMC Operator HMI - Startup Guidance
+# Primeform VMC Operator HMI - Startup Guidance
 
-This project is a full-stack web application designed as a simulated Human Machine Interface (HMI) for a VMC operator. It guides the operator through a strict sequence of stages (Power On -> Machine Checks -> Required Tools -> Workpiece Setup -> Ready -> Operation).
+## 📖 What This Project Is
 
-## Project Overview
-The HMI enforces a finite state machine workflow, preventing the operator from proceeding to the next stage until all requirements in the current stage are met and confirmed.
+This project is a full-stack web application designed as a simulated **Human Machine Interface (HMI)** for a Vertical Machining Center (VMC) operator. Its primary goal is to guide the operator through a strict, finite-state startup sequence before allowing them to operate the machine.
 
-## Tech Stack
-- **Frontend**: React, Vite, TypeScript, Tailwind CSS, Axios, Lucide React
-- **Backend**: Python, FastAPI, SQLAlchemy, Pydantic, Pytest
-- **Database**: PostgreSQL (or SQLite for testing/local fallback)
+The application enforces the following linear workflow:
+`POWER_ON` ➔ `MACHINE_CHECKS` ➔ `TOOLS` ➔ `WORKPIECE_SETUP` ➔ `READY` ➔ `OPERATION`
 
-## Architecture & Project Structure
-The repository uses a monorepo structure:
-```
-primeform_assignment/
-├── frontend/             # React application
-│   ├── src/
-│   │   ├── components/   # Reusable UI components (ChecklistItem, Layout)
-│   │   ├── services/     # API communication layer
-│   │   └── App.tsx       # Main state machine routing logic
-│   └── vercel.json       # Vercel deployment configuration
-├── backend/              # FastAPI application
-│   ├── app/
-│   │   ├── routers/      # API Endpoints (workflow, checks)
-│   │   ├── database.py   # SQLAlchemy setup
-│   │   ├── models.py     # Database models
-│   │   ├── schemas.py    # Pydantic validation schemas
-│   │   ├── seed.py       # Mock data initialization
-│   │   └── main.py       # FastAPI application entry point
-│   └── tests/            # Pytest test cases
-├── render.yaml           # Render deployment configuration
-└── .env.example          # Example environment variables
-```
+The HMI acts as a strict state machine—the operator cannot skip steps, and the backend validates all progression. The UI is designed to feel like a real industrial interface: high contrast (monochrome), distraction-free, with large touch targets and clear status indicators.
 
-## Features
-- **Strict State Progression**: Backend validates all state transitions.
-- **Persistence**: Data is saved to PostgreSQL to survive browser refreshes.
-- **Responsive Industrial UI**: High contrast, large touch targets, clear status indicators.
-- **Automated Testing**: Pytest suite to verify the state machine logic.
-- **RESTful API**: Clean API documentation automatically generated via OpenAPI/Swagger.
+---
 
-## Local Setup
+## 📊 Data & Assumptions
 
-### 1. Database (PostgreSQL)
-Ensure you have PostgreSQL running locally or via Docker. Create a user and database.
-```bash
-# Example via psql
-CREATE USER vmc_user WITH PASSWORD 'vmc_password';
-CREATE DATABASE vmc_db OWNER vmc_user;
-```
+Because this is a simulated environment, we made several assumptions and pre-loaded (seeded) specific data to satisfy the assignment requirements:
 
-### 2. Environment Variables
-Create a `.env` file in the root, `backend`, or `frontend` directory.
-```env
-# backend/.env
-DATABASE_URL=postgresql://vmc_user:vmc_password@localhost:5432/vmc_db
-VITE_API_URL=http://localhost:8000/api/v1
-```
+1. **The Machine**: We assume the operator is stationed at "VMC-1".
+2. **The Operation**: We assume the operator is preparing to run a CNC program named `O1001.NC` (Rev B) on `ALUMINUM 6061` material.
+3. **Machine Checks (6 items)**: We assume the machine requires exactly 6 checks: Power/Control, E-Stop released, Doors closed, No Alarms, Fluids ready, and Reference Return.
+4. **Tooling (3 items)**: We assume the operation requires 3 tools (T01 Face Mill, T05 End Mill, T08 Drill).
+5. **Workpiece Setup (5 items)**: We assume the operator must verify the Fixture, Orientation, Clamping instruction, Material Rev, and Work Offset.
 
-### 3. Backend Setup
+*All of this data is automatically seeded into the database the first time the backend starts.*
+
+---
+
+## 🛠️ Tech Stack
+
+This project was built with a modern, robust, and highly scalable tech stack:
+
+**Frontend (Client HMI)**
+* **React 18** with **Vite**: For fast, component-driven UI development.
+* **TypeScript**: Enforces strict type safety across the frontend.
+* **Tailwind CSS v4**: For rapid, utility-first styling (using a custom monochrome theme).
+* **Lucide React**: For clean, modern SVG iconography.
+* **Axios**: For handling REST API requests to the backend.
+
+**Backend (API & State Machine)**
+* **Python 3.11** with **FastAPI**: Extremely fast, asynchronous API framework.
+* **SQLAlchemy (ORM)**: For safe and structured database querying.
+* **Pydantic**: For strict data validation and serialization.
+* **PostgreSQL**: Production-ready relational database to persist the HMI state.
+* **Pytest**: For automated backend testing.
+
+---
+
+## 🚀 How to Run This Project (Local Development)
+
+To run this project on your local machine, follow these steps:
+
+### 1. Database Setup
+You will need a PostgreSQL database. You can either run one locally, or use a free cloud provider like [Render](https://render.com/) or [Neon](https://neon.tech/).
+* Create a database (e.g., `vmc_db`).
+* Get your connection string: `postgresql://user:password@host/vmc_db`
+
+### 2. Backend Setup
+Open a terminal and navigate to the `backend` folder:
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
-
-### 4. Running the Backend
-```bash
-uvicorn app.main:app --reload --port 8000
+Create a `.env` file in the `backend` folder and add your database URL:
+```env
+DATABASE_URL=postgresql://user:password@host/vmc_db
 ```
-The API documentation will be available at [http://localhost:8000/docs](http://localhost:8000/docs).
+Start the backend server:
+```bash
+uvicorn app.main:app --reload --port 10000
+```
+*The backend API will run at `http://localhost:10000` and automatically create the tables and seed the data.*
 
-### 5. Frontend Setup
+### 3. Frontend Setup
+Open a **new** terminal and navigate to the `frontend` folder:
 ```bash
 cd frontend
 npm install
 ```
-
-### 6. Running the Frontend
+Create a `.env` file in the `frontend` folder and point it to your local backend:
+```env
+VITE_API_URL=http://localhost:10000/api/v1
+```
+Start the frontend development server:
 ```bash
 npm run dev
 ```
-The HMI will be available at [http://localhost:5173](http://localhost:5173).
+*The HMI will now be available in your browser at `http://localhost:5173`.*
 
-## Running Tests
-To run the automated backend tests:
-```bash
-cd backend
-source venv/bin/activate
-PYTHONPATH=. pytest tests/
-```
+---
 
-## Deployment Instructions
+## 🌍 How to Deploy (Production)
 
-### Database (Neon)
-1. Create a project in Neon.
-2. Copy the connection string.
-3. Use it as the `DATABASE_URL` environment variable for the Backend.
+This repository is pre-configured for free cloud deployment:
 
-### Backend (Render)
-1. Connect your GitHub repository to Render.
-2. The provided `render.yaml` acts as a Blueprint.
-3. Ensure you set the `DATABASE_URL` environment variable in Render's dashboard.
-4. Render will handle the deployment automatically.
+**1. Database & Backend (Render)**
+* Create a free PostgreSQL database on Render.
+* Create a New Web Service on Render, connect your GitHub repo, and set the Root Directory to `backend`.
+* Add a `DATABASE_URL` environment variable pointing to the Render database you just created.
+* *Note: The `.python-version` file ensures Render uses a stable Python 3.11 environment.*
 
-### Frontend (Vercel)
-1. Import the project into Vercel.
-2. Set the Root Directory to `frontend`.
-3. Set the Environment Variable `VITE_API_URL` to your Render backend URL (e.g., `https://your-backend-app.onrender.com/api/v1`).
-4. Vercel will use the `vercel.json` for proper single-page application routing.
-
-## Demo Workflow
-1. Click "BEGIN STARTUP CHECKS".
-2. Confirm each machine check individually.
-3. Click "NEXT".
-4. Confirm each required tool.
-5. Click "NEXT".
-6. Confirm each workpiece setup instruction.
-7. Click "NEXT".
-8. Review the Ready screen, and click "PROCEED TO OPERATION".
-9. Use "START" and "STOP" to control the simulated operation.
-10. Refresh the page at any point to verify the state persists.
-
-## Design Decisions
-- **Single Page App Routing**: Rather than using a complex library like React Router, the application's current view is strictly driven by the `workflow_state.current_stage` fetched from the backend. This enforces the finite state machine and prevents users from manually navigating to a URL they aren't supposed to be on.
-- **Centralized Models & Schemas**: To keep the project architecture straightforward and maintainable without over-engineering, models and schemas are grouped together rather than nested deeply in domain folders.
-- **SQLAlchemy with SQLite Fallback**: While PostgreSQL is used, the engine setup allows for seamless fallback to SQLite for automated testing without mocking the entire database layer.
+**2. Frontend (Vercel)**
+* Create a new project on Vercel and connect your GitHub repo.
+* Set the Framework to `Vite` and the Root Directory to `frontend`.
+* Add a `VITE_API_URL` environment variable pointing to the public URL of your Render backend (make sure to include `/api/v1` at the end).
+* Click Deploy!
