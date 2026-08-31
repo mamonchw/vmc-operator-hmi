@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-neutral-900 text-neutral-100 font-sans antialiased;
+  }
+}
+
+/* Industrial style specific utilities */
+@layer components {
+  .btn-primary {
+    @apply bg-white hover:bg-neutral-200 text-black font-bold py-4 px-8 rounded-lg shadow-lg active:scale-95 transition-all text-xl;
+  }
+  
+  .btn-success {
+    @apply bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-8 rounded-lg shadow-lg active:scale-95 transition-all text-xl;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-8 rounded-lg shadow-lg active:scale-95 transition-all text-xl;
+  }
+  
+  .btn-disabled {
+    @apply bg-neutral-700 text-neutral-400 font-bold py-4 px-8 rounded-lg cursor-not-allowed text-xl;
+  }
+  
+  .card {
+    @apply bg-neutral-800 border border-neutral-700 rounded-xl p-6 shadow-xl;
+  }
+}
